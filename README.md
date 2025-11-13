@@ -37,7 +37,7 @@ pams-app/
 
 ### ✅ Authentication & User Management
 - Login/logout system
-- Role-based access control (Admin, Presales User, POC Admin, Analytics Access)
+- Role-based access control (Admin, Presales User, Analytics Access)
 - User management (Admin only)
 - Password management
 

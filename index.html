@@ -47,10 +47,6 @@
                     <h1 class="app-title">PAMS</h1>
                 </div>
                 <div class="header-right">
-                    <div id="userInfo" class="user-info">
-                        <span id="userName" class="user-name"></span>
-                        <div id="userRoles" class="user-roles"></div>
-                    </div>
                     <button id="logoutBtn" class="btn btn-secondary btn-sm">Logout</button>
                 </div>
             </div>
@@ -102,20 +98,13 @@
                         </svg>
                         <span>Accounts</span>
                     </a></li>
-                    <li><a href="#" data-view="settings" class="sidebar-link">
-                        <svg class="sidebar-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <circle cx="12" cy="12" r="3"></circle>
-                            <path d="M12 1v6m0 6v6M5.64 5.64l4.24 4.24m4.24 4.24l4.24 4.24M1 12h6m6 0h6M5.64 18.36l4.24-4.24m4.24-4.24l4.24-4.24"></path>
-                        </svg>
-                        <span>Settings</span>
-                    </a></li>
                     <li id="adminNav" class="hidden"><a href="#" data-view="admin" class="sidebar-link">
                         <svg class="sidebar-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <path d="M12 2L2 7l10 5 10-5-10-5z"></path>
                             <path d="M2 17l10 5 10-5"></path>
                             <path d="M2 12l10 5 10-5"></path>
                         </svg>
-                        <span>Admin Panel</span>
+                        <span>Admin & Settings</span>
                     </a></li>
                 </ul>
             </nav>
@@ -161,11 +150,8 @@
                     <!-- Quick Actions -->
                     <div class="action-bar">
                         <div class="action-buttons">
-                            <button class="btn btn-customer" onclick="App.openCustomerActivityModal()">
-                                + Log Customer Activity
-                            </button>
-                            <button class="btn btn-internal" onclick="App.openInternalActivityModal()">
-                                + Log Internal Activity
+                            <button class="btn btn-primary" onclick="Activities.openActivityModal()">
+                                + Log Activity
                             </button>
                         </div>
                     </div>
@@ -193,11 +179,8 @@
                             <input type="text" class="form-control" placeholder="Search activities..." id="activitySearch" onkeyup="App.searchActivities()">
                         </div>
                         <div class="action-buttons">
-                            <button class="btn btn-customer" onclick="App.openCustomerActivityModal()">
-                                + Customer Activity
-                            </button>
-                            <button class="btn btn-internal" onclick="App.openInternalActivityModal()">
-                                + Internal Activity
+                            <button class="btn btn-primary" onclick="Activities.openActivityModal()">
+                                + Log Activity
                             </button>
                         </div>
                     </div>
@@ -230,17 +213,54 @@
                 <div id="reportsView" class="view hidden">
                     <div class="page-header">
                         <h1 class="page-title">Reports</h1>
-                        <p class="page-subtitle">Monthly presales activity reports</p>
+                        <p class="page-subtitle">Activity management and monthly reports</p>
                     </div>
 
-                    <div class="action-bar">
-                        <div class="form-group">
-                            <label class="form-label">Select Month</label>
-                            <input type="month" id="reportMonth" class="form-control" onchange="App.loadReports()">
+                    <!-- Tabs -->
+                    <div class="tabs">
+                        <button class="tab-btn active" onclick="App.switchReportTab('activities')">Activity List</button>
+                        <button class="tab-btn" onclick="App.switchReportTab('reports')">Reports & Charts</button>
+                        <button class="tab-btn" onclick="App.switchReportTab('management')">Activity Management</button>
+                    </div>
+
+                    <!-- Activity List Tab -->
+                    <div id="reportActivitiesTab" class="tab-content">
+                        <div class="action-bar">
+                            <div class="search-bar">
+                                <input type="text" class="form-control" placeholder="Search activities..." id="reportActivitySearch" onkeyup="App.searchActivities()">
+                            </div>
                         </div>
+                        <div id="reportActivitiesContent"></div>
                     </div>
 
-                    <div id="reportsContent"></div>
+                    <!-- Reports Tab -->
+                    <div id="reportReportsTab" class="tab-content hidden">
+                        <div class="action-bar">
+                            <div class="form-group">
+                                <label class="form-label">Select Month</label>
+                                <input type="month" id="reportMonth" class="form-control" onchange="App.loadReports()">
+                            </div>
+                        </div>
+                        <div id="reportsContent"></div>
+                    </div>
+
+                    <!-- Activity Management Tab -->
+                    <div id="reportManagementTab" class="tab-content hidden">
+                        <div class="action-bar">
+                            <div class="flex mb-4 space-x-4" style="display: flex; gap: 1rem; flex-wrap: wrap;">
+                                <select id="reportUserFilter" class="form-control" onchange="App.filterReportActivities()" style="min-width: 150px;">
+                                    <option value="">All Users</option>
+                                </select>
+                                <select id="reportRegionFilter" class="form-control" onchange="App.filterReportActivities()" style="min-width: 150px;">
+                                    <option value="">All Regions</option>
+                                </select>
+                                <select id="reportActivityTypeFilter" class="form-control" onchange="App.filterReportActivities()" style="min-width: 150px;">
+                                    <option value="">All Activity Types</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div id="reportManagementContent"></div>
+                    </div>
                 </div>
 
                 <!-- Accounts View -->
@@ -259,42 +279,39 @@
                     <div id="accountsContent"></div>
                 </div>
 
-                <!-- Settings View -->
-                <div id="settingsView" class="view hidden">
+                <!-- Admin & Settings View -->
+                <div id="adminView" class="view hidden">
                     <div class="page-header">
-                        <h1 class="page-title">Settings</h1>
-                        <p class="page-subtitle">Manage your preferences</p>
+                        <h1 class="page-title">Admin & Settings</h1>
+                        <p class="page-subtitle">Manage users, sales reps, industries, regions, and system settings</p>
                     </div>
 
-                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                        <!-- My Regions -->
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+                        <!-- System Users -->
                         <div class="card">
                             <div class="card-header">
-                                <h3>My Regions</h3>
+                                <h3>System Users</h3>
                             </div>
                             <div class="card-body">
-                                <div id="userRegionsList" class="space-y-2"></div>
-                                <button id="saveRegions" class="btn btn-primary mt-4" onclick="App.saveUserRegions()">Save Regions</button>
+                                <button id="addUserBtn" class="btn btn-primary mb-4" onclick="Admin.showAddUserModal()">Add New User</button>
+                                <div id="usersList" class="space-y-2"></div>
                             </div>
                         </div>
 
-                        <!-- My Sales Reps -->
+                        <!-- Sales Users -->
                         <div class="card">
                             <div class="card-header">
-                                <h3>My Sales Reps</h3>
+                                <h3>Sales Users</h3>
                             </div>
                             <div class="card-body">
-                                <div class="flex mb-4">
-                                    <input type="text" id="newSalesRep" class="form-control" placeholder="Add sales rep name">
-                                    <button id="addSalesRepBtn" class="btn btn-success ml-2" onclick="App.addSalesRep()">Add</button>
-                                </div>
+                                <button id="addSalesRepBtn" class="btn btn-primary mb-4" onclick="Admin.showAddSalesRepModal()">Add New Sales User</button>
                                 <div id="salesRepsList" class="space-y-2"></div>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Interface Preference (Admin Only) -->
-                    <div id="interfaceSettings" class="card mt-6 hidden">
+                    <!-- Interface Settings -->
+                    <div class="card mb-6">
                         <div class="card-header">
                             <h3>Interface Preference (Global)</h3>
                         </div>
@@ -305,76 +322,34 @@
                                     <option value="modern">Modern Sidebar (Default)</option>
                                     <option value="compact">Compact Sidebar</option>
                                     <option value="dashboard">Dashboard-First</option>
+                                    <option value="minimal">Minimal Clean</option>
                                 </select>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Admin Panel View -->
-                <div id="adminView" class="view hidden">
-                    <div class="page-header">
-                        <h1 class="page-title">Admin Panel</h1>
-                        <p class="page-subtitle">Manage users, industries, and regions</p>
-                    </div>
-
-                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-                        <!-- User Management -->
-                        <div class="card">
-                            <div class="card-header">
-                                <h3>User Management</h3>
-                            </div>
-                            <div class="card-body">
-                                <button id="addUserBtn" class="btn btn-primary mb-4" onclick="Admin.showAddUserModal()">Add New User</button>
-                                <div id="usersList" class="space-y-2"></div>
-                            </div>
-                        </div>
-
-                        <!-- Industry & Region Management -->
-                        <div class="card">
-                            <div class="card-header">
-                                <h3>Industry & Region Management</h3>
-                            </div>
-                            <div class="card-body">
-                                <div class="form-group mb-4">
-                                    <label class="form-label">Add Industry</label>
-                                    <div class="flex">
-                                        <input type="text" id="newIndustry" class="form-control" placeholder="Industry name">
-                                        <button id="addIndustryBtn" class="btn btn-success ml-2" onclick="Admin.addIndustry()">Add</button>
-                                    </div>
-                                </div>
-                                <div id="industriesList" class="space-y-2 mb-6"></div>
-
-                                <div class="form-group mb-4">
-                                    <label class="form-label">Add Region</label>
-                                    <div class="flex">
-                                        <input type="text" id="newRegion" class="form-control" placeholder="Region name">
-                                        <button id="addRegionBtn" class="btn btn-success ml-2" onclick="Admin.addRegion()">Add</button>
-                                    </div>
-                                </div>
-                                <div id="regionsList" class="space-y-2"></div>
+                                <small class="text-muted">This setting applies to all users globally</small>
                             </div>
                         </div>
                     </div>
 
-                    <!-- All Activities (Admin View) -->
+                    <!-- POC Sandbox Access Management -->
                     <div class="card">
                         <div class="card-header">
-                            <h3>All Activities Management</h3>
+                            <h3>POC Sandbox Access Management</h3>
                         </div>
                         <div class="card-body">
-                            <div class="flex mb-4 space-x-4">
-                                <select id="adminUserFilter" class="form-control" onchange="Admin.filterAdminActivities()">
-                                    <option value="">All Users</option>
-                                </select>
-                                <select id="adminRegionFilter" class="form-control" onchange="Admin.filterAdminActivities()">
-                                    <option value="">All Regions</option>
-                                </select>
-                                <select id="adminActivityFilter" class="form-control" onchange="Admin.filterAdminActivities()">
-                                    <option value="">All Activity Types</option>
-                                </select>
+                            <div class="action-bar mb-4">
+                                <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+                                    <select id="pocStatusFilter" class="form-control" onchange="Admin.filterPOCSandbox()" style="min-width: 150px;">
+                                        <option value="">All Status</option>
+                                        <option value="Assigned">Assigned</option>
+                                        <option value="Unassigned">Unassigned</option>
+                                    </select>
+                                    <select id="pocAccountFilter" class="form-control" onchange="Admin.filterPOCSandbox()" style="min-width: 150px;">
+                                        <option value="">All Accounts</option>
+                                    </select>
+                                    <input type="date" id="pocDateFrom" class="form-control" placeholder="From Date" onchange="Admin.filterPOCSandbox()" style="min-width: 150px;">
+                                    <input type="date" id="pocDateTo" class="form-control" placeholder="To Date" onchange="Admin.filterPOCSandbox()" style="min-width: 150px;">
+                                </div>
                             </div>
-                            <div id="adminActivitiesTable"></div>
+                            <div id="pocSandboxTable"></div>
                         </div>
                     </div>
                 </div>
